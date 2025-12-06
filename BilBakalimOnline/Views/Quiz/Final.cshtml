@@ -1,0 +1,169 @@
+﻿@using System.Collections.Generic
+
+@{
+    ViewData["Title"] = "Bil Bakalım - Final";
+
+    var playerName = ViewBag.PlayerName as string;
+
+    int score = ViewBag.Score is int sc ? sc : 0;
+    int totalQuestions = ViewBag.TotalQuestions is int tq ? tq : 0;
+    int correctCount = ViewBag.CorrectCount is int cc ? cc : 0;
+    int wrongCount = ViewBag.WrongCount is int wc ? wc : 0;
+
+    string comment = ViewBag.Comment as string ?? "";
+
+    var rankList = ViewBag.RankList as List<KeyValuePair<string, int>>;
+}
+
+<div class="final-page">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+
+                <div class="card shadow-lg border-0 final-card">
+                    <div class="card-header text-center text-white final-header">
+                        <h2 class="mb-1">🏁 Yarışma Bitti!</h2>
+                        <p class="mb-0">Bil Bakalım Aile Yarışması</p>
+                    </div>
+
+                    <div class="card-body final-body text-center">
+
+                        <h4 class="mb-3">
+                            @(string.IsNullOrWhiteSpace(playerName) ? "Oyuncu" : playerName),
+                            oyunun bitti! 🎉
+                        </h4>
+
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <div class="stat-box">
+                                    <div class="stat-label">Toplam Puan</div>
+                                    <div class="stat-value text-success">@score</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stat-box">
+                                    <div class="stat-label">Doğru Sayısı</div>
+                                    <div class="stat-value text-primary">@correctCount</div>
+                                    <div class="stat-sub">/ @totalQuestions soru</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="stat-box">
+                                    <div class="stat-label">Yanlış Sayısı</div>
+                                    <div class="stat-value text-danger">@wrongCount</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="final-comment mb-4">
+                            @comment
+                        </p>
+
+                        <hr />
+
+                        <h5 class="mb-3">🏆 Aile Skor Tablosu</h5>
+
+                        @if (rankList != null && rankList.Count > 0)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-striped align-middle mb-4">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px;">Sıra</th>
+                                            <th>Oyuncu</th>
+                                            <th style="width: 120px;">Puan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var rank = 1;
+                                        }
+                                        @foreach (var item in rankList)
+                                        {
+                                            <tr class="@(item.Key == playerName ? "table-success" : "")">
+                                                <td>#@rank</td>
+                                                <td>@item.Key</td>
+                                                <td>@item.Value</td>
+                                            </tr>
+                                            rank++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Henüz kimse puan almadı.</p>
+                        }
+
+                        <div class="d-flex justify-content-center gap-3 mt-3">
+                            <a asp-action="Index" class="btn btn-outline-primary btn-lg">
+                                🔄 Aynı turu tekrar oyna
+                            </a>
+                            <a asp-action="Restart" class="btn btn-success btn-lg">
+                                🏁 Yarışı Baştan Oyna
+                            </a>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer text-center text-muted">
+                        Arda Gündüzhev tarafından ailesiyle beraber oynamak için yapılmıştır ❤️
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .final-page {
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #1e3c72, #020024);
+        color: #fff;
+    }
+
+    .final-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .final-header {
+        background: linear-gradient(90deg, #007bff, #00c6ff);
+    }
+
+    .final-body {
+        background: #ffffff;
+        color: #333;
+        padding: 30px 25px 35px;
+    }
+
+    .stat-box {
+        border-radius: 12px;
+        padding: 15px;
+        background: #f7f9fc;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.02);
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .stat-sub {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .final-comment {
+        font-size: 1.05rem;
+        font-weight: 500;
+    }
+</style>

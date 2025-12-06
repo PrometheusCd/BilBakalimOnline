@@ -1,0 +1,209 @@
+﻿@using System.Collections.Generic
+
+@{
+    ViewData["Title"] = "Bil Bakalım - Sonuç";
+
+    bool correct = ViewBag.Correct == true;
+    string playerName = ViewBag.PlayerName as string ?? "Oyuncu";
+    string questionText = ViewBag.QuestionText as string ?? "";
+    char correctOption = ViewBag.CorrectOption is char co ? co : '?';
+    var scores = ViewBag.Scores as List<KeyValuePair<string, int>>;
+}
+
+<div class="result-page">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+
+                <div class="card shadow-lg border-0 result-card">
+                    <div class="result-header text-white @(correct ? "bg-success" : "bg-danger")">
+                        <h2 class="mb-0">
+                            @(correct ? "🎉 Doğru Cevap!" : "❌ Yanlış Cevap!")
+                        </h2>
+                    </div>
+
+                    <div class="card-body result-body @(correct ? "result-correct" : "result-wrong")">
+
+                        <p class="mb-2"><strong>Soru:</strong> @questionText</p>
+
+                        <p class="mb-3">
+                            <strong>@playerName</strong>, cevabın:
+                            @if (correct)
+                            {
+                                <span class="text-success fw-bold">Doğru ✅</span>
+                            }
+                            else
+                            {
+                                <span class="text-danger fw-bold">Yanlış ❌</span>
+                            }
+                        </p>
+
+                        <p class="mb-4">
+                            Doğru şık:
+                            <span class="badge bg-primary fs-5">@correctOption</span>
+                        </p>
+
+                        <h5 class="mb-3">🏆 Puan Tablosu</h5>
+
+                        @if (scores != null && scores.Count > 0)
+                        {
+                            <div class="table-responsive mb-4">
+                                <table class="table table-striped align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 60px;">Sıra</th>
+                                            <th>Oyuncu</th>
+                                            <th style="width: 120px;">Puan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            var rank = 1;
+                                        }
+                                        @foreach (var item in scores)
+                                        {
+                                            <tr class="@(item.Key == playerName ? "table-success" : "")">
+                                                <td>#@rank</td>
+                                                <td>@item.Key</td>
+                                                <td>@item.Value</td>
+                                            </tr>
+                                            rank++;
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted">Henüz kimse puan almadı.</p>
+                        }
+
+                        <div class="d-flex justify-content-center gap-3 mt-3">
+                            <form asp-action="NextQuestion" method="post">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    👉 Sonraki Soruya Geç
+                                </button>
+                            </form>
+
+                            <form asp-action="Index" method="post">
+                                <button type="submit" class="btn btn-outline-secondary btn-lg">
+                                    🔁 Aynı Soruyu Tekrar Göster
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer text-center text-muted">
+                        Arda Gündüzhev tarafından ailesiyle beraber keyifli vakit geçirmek için hazırlanmıştır 😊
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .result-page {
+        min-height: 100vh;
+        background: radial-gradient(circle at top, #1e3c72, #020024);
+        color: #fff;
+    }
+
+    .result-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+
+    .result-header {
+        padding: 16px;
+        text-align: center;
+    }
+
+    .result-body {
+        background: #ffffff;
+        color: #333;
+        padding: 24px 24px 28px;
+        position: relative;
+    }
+
+    /* Doğru cevapta hafif parlayan animasyon */
+    .result-correct {
+        animation: resultPulse 0.7s ease-out;
+        box-shadow: 0 0 12px rgba(25, 135, 84, 0.4);
+    }
+
+    @@keyframes resultPulse {
+        0% {
+            transform: scale(0.98);
+            box-shadow: 0 0 0 rgba(25,135,84,0.0);
+        }
+
+        50% {
+            transform: scale(1.01);
+            box-shadow: 0 0 20px rgba(25,135,84,0.6);
+        }
+
+        100% {
+            transform: scale(1.0);
+            box-shadow: 0 0 12px rgba(25,135,84,0.4);
+        }
+    }
+
+    /* Yanlış cevapta shake (titreşim) efekti */
+    .result-wrong {
+        animation: resultShake 0.4s ease-in-out;
+        box-shadow: 0 0 12px rgba(220, 53, 69, 0.4);
+    }
+
+    @@keyframes resultShake {
+        0% {
+            transform: translateX(0);
+        }
+
+        20% {
+            transform: translateX(-6px);
+        }
+
+        40% {
+            transform: translateX(6px);
+        }
+
+        60% {
+            transform: translateX(-4px);
+        }
+
+        80% {
+            transform: translateX(4px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        console.log("Result scripts yüklendi");
+
+        const correct = @((ViewBag.Correct == true).ToString().ToLower());
+        const correctSound = new Audio('/sounds/correct.mp3');
+        const wrongSound = new Audio('/sounds/wrong.mp3');
+
+        window.addEventListener('load', () => {
+            try {
+                if (correct) {
+                    console.log("Doğru cevap sesi çalacak");
+                    correctSound.play();
+                } else {
+                    console.log("Yanlış cevap sesi çalacak");
+                    wrongSound.play();
+                }
+            } catch (e) {
+                console.log("Result sound play hatası", e);
+            }
+        });
+    </script>
+}

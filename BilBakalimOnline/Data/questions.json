@@ -1,0 +1,38 @@
+﻿[
+    {
+        "Id": 1,
+        "Text": "Türkiye'nin başkenti neresidir?",
+        "OptionA": "İstanbul",
+        "OptionB": "Ankara",
+        "OptionC": "İzmir",
+        "OptionD": "Bursa",
+        "CorrectOption": "B"
+    },
+    {
+        "Id": 2,
+        "Text": "Aşağıdakilerden hangisi bir programlama dilidir?",
+        "OptionA": "HTML",
+        "OptionB": "CSS",
+        "OptionC": "C#",
+        "OptionD": "Photoshop",
+        "CorrectOption": "C"
+    },
+    {
+        "Id": 3,
+        "Text": "TRT'nin açılımı nedir?",
+        "OptionA": "Türkiye Radyo Televizyon Kurumu",
+        "OptionB": "Türkiye Radyo Teşkilatı",
+        "OptionC": "Toplu Radyo Televizyon",
+        "OptionD": "Türkiye Radyo Topluluğu",
+        "CorrectOption": "A"
+    },
+    {
+        "Id": 4,
+        "Text": "Aşağıdakilerden hangisi bir işletim sistemidir?",
+        "OptionA": "Photoshop",
+        "OptionB": "Windows",
+        "OptionC": "Chrome",
+        "OptionD": "Word",
+        "CorrectOption": "B"
+    }
+]

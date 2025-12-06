@@ -1,0 +1,87 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+/* ==== BilBakalim Online Tema ==== */
+
+body {
+    background: radial-gradient(circle at top, #1a237e, #000000);
+    color: #f5f5f5;
+}
+
+.navbar,
+footer {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+.quiz-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quiz-card {
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 16px;
+}
+
+    .quiz-card .card-header {
+        border-radius: 16px 16px 0 0;
+    }
+
+    .quiz-card .card-footer {
+        border-radius: 0 0 16px 16px;
+    }
+
+.quiz-timer-badge {
+    font-size: 1rem;
+    box-shadow: 0 0 8px rgba(255, 193, 7, 0.7);
+}
+
+.quiz-question-text {
+    font-weight: 600;
+}
+
+.quiz-option label {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.quiz-option input:checked + label {
+    background-color: rgba(25, 135, 84, 0.15);
+    transform: translateY(-1px);
+}
+
+.quiz-option label:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}

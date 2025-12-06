@@ -1,0 +1,306 @@
+﻿@using Microsoft.AspNetCore.Http
+@model BilBakalimOnline.Models.Question
+@{
+    ViewData["Title"] = "Bil Bakalım - Soru";
+}
+
+<div class="quiz-page">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card shadow-lg border-0 quiz-card">
+
+                    <div class="card-header text-center bg-primary text-white">
+                        <h2 class="mb-0">🎯 Bil Bakalım Yarışması</h2>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="badge bg-warning text-dark px-3 py-2 quiz-timer-badge me-2">
+                                    Kalan süre: <span id="timer">10</span> saniye
+                                </span>
+
+                                @if (ViewBag.PlayerName != null)
+                                {
+                                    <span class="badge bg-success text-white px-3 py-2">
+                                        @ViewBag.PlayerName : @ViewBag.Score puan
+                                    </span>
+                                }
+                            </div>
+
+                            <span class="badge bg-info text-dark px-3 py-2">
+                                Soru ID: @Model.Id
+                            </span>
+                        </div>
+
+                        <h4 class="mb-4 quiz-question-text">@Model.Text</h4>
+
+                        <form id="quizForm" asp-action="Answer" method="post">
+
+                            @* İsim sadece ilk soruda / ilk girişte görünsün *@
+                            @if (Context.Session.GetString("PlayerName") == null)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">İsminiz:</label>
+                                    <input type="text" name="playerName" class="form-control" placeholder="Adınızı yazın..." required />
+                                </div>
+                            }
+
+                            <hr />
+
+                            <div class="mb-2 form-check quiz-option">
+                                <input class="form-check-input" type="radio" name="selectedOption" id="optA" value="A" required />
+                                <label class="form-check-label" for="optA">
+                                    A) @Model.OptionA
+                                </label>
+                            </div>
+
+                            <div class="mb-2 form-check quiz-option">
+                                <input class="form-check-input" type="radio" name="selectedOption" id="optB" value="B" />
+                                <label class="form-check-label" for="optB">
+                                    B) @Model.OptionB
+                                </label>
+                            </div>
+
+                            <div class="mb-2 form-check quiz-option">
+                                <input class="form-check-input" type="radio" name="selectedOption" id="optC" value="C" />
+                                <label class="form-check-label" for="optC">
+                                    C) @Model.OptionC
+                                </label>
+                            </div>
+
+                            <div class="mb-3 form-check quiz-option">
+                                <input class="form-check-input" type="radio" name="selectedOption" id="optD" value="D" />
+                                <label class="form-check-label" for="optD">
+                                    D) @Model.OptionD
+                                </label>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-3">
+                                <button id="joker5050" type="button" class="btn btn-warning">
+                                    🃏 50/50 Joker
+                                </button>
+
+                                <button id="timeJoker" type="button" class="btn btn-outline-info">
+                                    ⏳ Süre Jokeri (+10 sn)
+                                </button>
+
+                                <button id="audienceJoker" type="button" class="btn btn-outline-primary">
+                                    👥 Seyirci Jokeri
+                                </button>
+
+                                <button id="submitButton" type="submit" class="btn btn-success btn-lg">
+                                    ✅ Cevabı Gönder
+                                </button>
+                            </div>
+
+                            <div id="audiencePoll" class="mt-4" style="display:none;">
+                                <h5>Seyirci Oylaması Sonuçları</h5>
+
+                                <div class="mb-2">
+                                    <small>A</small>
+                                    <div class="progress">
+                                        <div id="pollA" class="progress-bar" role="progressbar" style="width: 0%">A: 0%</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <small>B</small>
+                                    <div class="progress">
+                                        <div id="pollB" class="progress-bar" role="progressbar" style="width: 0%">B: 0%</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <small>C</small>
+                                    <div class="progress">
+                                        <div id="pollC" class="progress-bar" role="progressbar" style="width: 0%">C: 0%</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-2">
+                                    <small>D</small>
+                                    <div class="progress">
+                                        <div id="pollD" class="progress-bar" role="progressbar" style="width: 0%">D: 0%</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <div class="card-footer text-center text-muted">
+                        Arda Gündüzhev tarafından ailesiyle beraber oynamak için yapılmıştır ❤️
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        console.log("Index scripts yüklendi");
+
+        // === TIMER ===
+        let remaining = 10; // saniye
+        const timerSpan = document.getElementById("timer");
+        const submitButton = document.getElementById("submitButton");
+        const form = document.getElementById("quizForm");
+
+        // Sesler
+        const timeupSound = new Audio('/sounds/timeup.mp3');
+
+        const intervalId = setInterval(() => {
+            remaining--;
+            if (remaining <= 0) {
+                remaining = 0;
+                clearInterval(intervalId);
+
+                console.log("Süre bitti, ses çalınacak");
+
+                // Süre bittiğinde ses
+                try { timeupSound.play(); } catch (e) { console.log("timeup play hatası", e); }
+
+                submitButton.disabled = true;
+                submitButton.classList.remove("btn-success");
+                submitButton.classList.add("btn-secondary");
+                submitButton.innerText = "⏱ Süre doldu";
+
+                // Otomatik göndermek istersen:
+                // form.submit();
+            }
+
+            timerSpan.textContent = remaining;
+        }, 1000);
+
+        // === 50/50 JOKER ===
+        const jokerButton = document.getElementById("joker5050");
+        const correctOption = '@Model.CorrectOption'; // 'A','B','C','D'
+
+        const timeJokerButton = document.getElementById("timeJoker");
+        const audienceButton = document.getElementById("audienceJoker");
+
+        if (jokerButton) {
+            let jokerUsed = false;
+
+            jokerButton.addEventListener("click", () => {
+                if (jokerUsed) return;
+                jokerUsed = true;
+
+                jokerButton.disabled = true;
+                jokerButton.classList.remove("btn-warning");
+                jokerButton.classList.add("btn-secondary");
+                jokerButton.innerText = "🃏 50/50 Kullanıldı";
+
+                const allOptions = ['A', 'B', 'C', 'D'];
+                const wrongOptions = allOptions.filter(o => o !== correctOption);
+
+                for (let i = wrongOptions.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    const temp = wrongOptions[i];
+                    wrongOptions[i] = wrongOptions[j];
+                    wrongOptions[j] = temp;
+                }
+
+                const toHide = wrongOptions.slice(0, 2);
+
+                toHide.forEach(o => {
+                    const input = document.getElementById("opt" + o);
+                    if (input) {
+                        const wrapper = input.closest(".quiz-option");
+                        if (wrapper) {
+                            wrapper.style.display = "none";
+                        }
+                    }
+                });
+            });
+        }
+
+        // === SÜRE JOKERİ (+10 sn) ===
+        if (timeJokerButton) {
+            let timeJokerUsed = false;
+
+            timeJokerButton.addEventListener("click", () => {
+                if (timeJokerUsed) return;
+                if (remaining <= 0) return;
+
+                timeJokerUsed = true;
+
+                remaining += 10;
+                timerSpan.textContent = remaining;
+
+                timeJokerButton.disabled = true;
+                timeJokerButton.classList.remove("btn-outline-info");
+                timeJokerButton.classList.add("btn-secondary");
+                timeJokerButton.innerText = "⏳ Süre Jokeri Kullanıldı";
+            });
+        }
+
+        // === SEYİRCİ JOKERİ ===
+        const pollContainer = document.getElementById("audiencePoll");
+        const pollBars = {
+            'A': document.getElementById("pollA"),
+            'B': document.getElementById("pollB"),
+            'C': document.getElementById("pollC"),
+            'D': document.getElementById("pollD")
+        };
+
+        if (audienceButton) {
+            let audienceUsed = false;
+
+            audienceButton.addEventListener("click", () => {
+                if (audienceUsed) return;
+                audienceUsed = true;
+
+                audienceButton.disabled = true;
+                audienceButton.classList.remove("btn-outline-primary");
+                audienceButton.classList.add("btn-secondary");
+                audienceButton.innerText = "👥 Seyirci Jokeri Kullanıldı";
+
+                const options = ['A', 'B', 'C', 'D'];
+                const correct = correctOption;
+
+                const correctBase = 40 + Math.floor(Math.random() * 21); // 40-60
+                let remainingPercent = 100 - correctBase;
+
+                const wrongOptions = options.filter(o => o !== correct);
+                const wrongPercents = [];
+
+                for (let i = 0; i < wrongOptions.length; i++) {
+                    if (i === wrongOptions.length - 1) {
+                        wrongPercents.push(remainingPercent);
+                    } else {
+                        const val = Math.floor(Math.random() * (remainingPercent + 1));
+                        wrongPercents.push(val);
+                        remainingPercent -= val;
+                    }
+                }
+
+                const perc = {};
+                perc[correct] = correctBase;
+
+                for (let i = 0; i < wrongOptions.length; i++) {
+                    perc[wrongOptions[i]] = wrongPercents[i];
+                }
+
+                if (pollContainer) {
+                    pollContainer.style.display = "block";
+                }
+
+                options.forEach(o => {
+                    const bar = pollBars[o];
+                    if (bar) {
+                        const p = perc[o] ?? 0;
+                        bar.style.width = p + "%";
+                        bar.textContent = o + ": " + p + "%";
+                    }
+                });
+            });
+        }
+    </script>
+}
