@@ -1,7 +1,9 @@
 ﻿services:
   - type: web
-    name: bilbakalimonline
-    runtime: dotnet
-    configPath: BilBakalimOnline.csproj
+    name: BilBakalimOnline
+    env: dotnet
+    plan: free
+    repo: https://github.com/PrometheusCd/BilBakalimOnline
+    branch: master
     buildCommand: "dotnet publish -c Release -o out"
     startCommand: "dotnet out/BilBakalimOnline.dll"
